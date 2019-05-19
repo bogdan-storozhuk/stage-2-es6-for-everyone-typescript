@@ -16,14 +16,14 @@ class FighterService {
   }
 
   async getFighterDetails(_id) {
-
-    try {
-      const res = await fetch(`./resources/api/details/fighter/${_id}.json`);
-      const jsonObject = await res.json();
-      return await jsonObject;
-    } catch (error) {
-      throw error;
+    const path = `./resources/api/details/fighter/${_id}.json`;
+    const res = await fetch(path);
+    if (!res.ok) {
+      throw new Error(`Could not fetch ${path}` +
+        `, received ${res.status}`)
     }
+    const jsonObject = await res.json();
+    return await jsonObject;
 
   };
 }

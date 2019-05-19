@@ -27,16 +27,61 @@ class FightersView extends View {
     this.element.append(...fighterElements);
   }
 
-  handleFighterClick = async (event, fighter) => {
+  async handleFighterClick(event, fighter) {
+
     if (!this.fightersDetailsMap.has(fighter._id)) {
       const result = await fighterService.getFighterDetails(fighter._id);
       this.fightersDetailsMap.set(fighter._id, result);
     }
+
     let result = this.fightersDetailsMap.get(fighter._id);
-    console.log(result);
+
+
+  this.openPopup();
+
+  this.addEditDataToPopup(result);
+
+  $('.popup-close').on('click', () => {
+      this.closePopup();
+    });
+
     // get from map or load info and add to fightersMap
     // show modal with fighter info
     // allow to edit health and power in this modal
+  }
+
+   addEditDataToPopup = (object) => {
+    let entries = Object.entries(object);
+
+    entries =  entries.filter(entry => entry[0] !== '_id' && entry[0] !== 'source' && entry[0] !== 'name');
+    let htmlText ='';
+    entries.forEach(item => {
+        htmlText += `  <label for="${item[0]}"><b>${item[0]}</b></label>
+                       <input type="text" id="${item[0]}" value="${item[1]}" 
+                       placeholder="Enter ${item[0]}" name="${item[0]}"/> 
+                       <br/>`;
+    });  
+
+    htmlText += '<br/> <button id="editFighter">Edit</button>';
+    $('#editPopup').append(htmlText);
+    
+    $('#editFighter').on('click', () => this.getChangedFighterData(object));
+  }
+
+  getChangedFighterData = (object) =>{
+    let keys = Object.keys(object);
+    keys.forEach(key => object[key] = $('#'+key).val());
+    this.fightersDetailsMap.set(object._id, object);
+    this.closePopup();
+  }
+
+  openPopup =() =>{
+    $('.overlay').css('display',  'block');
+  }
+
+  closePopup =()=> {
+    $('.overlay').css('display',  'none');
+    $('#editPopup').empty();
   }
 }
 
