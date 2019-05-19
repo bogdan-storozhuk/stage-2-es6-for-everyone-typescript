@@ -58,3 +58,38 @@ body {
     background: rgba(255, 255, 255, 0.7);
     visibility: hidden;
 }
+.overlay {
+    position: fixed;
+    display: none;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(182, 7, 7, 0.5);
+    z-index: 3;
+  }
+  .overlay .popup {
+    position: fixed;
+    z-index: 4;
+    left: 50%;
+    top: 30px;
+    width: 376px;
+    -webkit-transform: translateX(-50%);
+        -ms-transform: translateX(-50%);
+            transform: translateX(-50%);
+  }
+  .overlay .popup-close {
+    position: absolute;
+    right: -20px;
+    top: -35px;
+    cursor: pointer;
+    font-size: 35px;
+    color: #11100f;
+    font-weight: 300;
+  }
+
+  .overlay .popup-info {
+    background-color: white;
+    background-size: cover;
+    padding: 35px 88px 50px 88px;
+    color: rgb(177, 8, 8);
+  }
