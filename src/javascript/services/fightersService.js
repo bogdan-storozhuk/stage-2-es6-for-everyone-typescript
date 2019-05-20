@@ -1,6 +1,9 @@
-import { callApi } from '../helpers/apiHelper';
+import {
+  callApi
+} from '../helpers/apiHelper';
 
 class FighterService {
+
   async getFighters() {
     try {
       const endpoint = 'fighters.json';
@@ -13,9 +16,16 @@ class FighterService {
   }
 
   async getFighterDetails(_id) {
-    // implement this method
-    // endpoint - `details/fighter/${_id}.json`;
-  }
+    const path = `./resources/api/details/fighter/${_id}.json`;
+    const res = await fetch(path);
+    if (!res.ok) {
+      throw new Error(`Could not fetch ${path}` +
+        `, received ${res.status}`)
+    }
+    const jsonObject = await res.json();
+    return await jsonObject;
+
+  };
 }
 
 export const fighterService = new FighterService();
