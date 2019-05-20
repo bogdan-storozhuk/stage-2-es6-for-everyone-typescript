@@ -16,7 +16,7 @@ class App {
       const fighters = await fighterService.getFighters();
       const fightersView = new FightersView(fighters);
       const fightersElement = fightersView.element;
-      App.rootElement.appendChild(fightersElement);
+      App.rootElement.prepend(fightersElement);
     } catch (error) {
       console.warn(error);
       App.rootElement.innerText = 'Failed to load data';

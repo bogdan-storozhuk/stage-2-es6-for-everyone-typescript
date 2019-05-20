@@ -28,26 +28,28 @@ class FightersView extends View {
       className: 'fighters'
     });
 
-    var button = document.createElement("button");
-       button. innerHTML = "Start battle";
-       button.id ='startBattle';
+    let button = document.createElement("button"),
+      rootElement = document.getElementById('root');
+    button.innerHTML = "Start battle";
+    button.id = 'startBattle';
+    button.classList = 'start';
+    rootElement.appendChild(button);
+    this.element.append(...fighterElements);
 
-    this.element.append(...fighterElements, button);
 
-
-    button.addEventListener('click', event => this.startBattle(event), false);
+    button.addEventListener('click', event => this.initializeBattle(event), false);
   }
 
-  startBattle(){
-    if(this.battleParticipants.length < 2){
+  initializeBattle() {
+    if (this.battleParticipants.length < 2) {
       alert(`Battle participants must be more than ${this.battleParticipants.length}`);
     }
 
-    if(this.battleParticipants.length > 2){
+    if (this.battleParticipants.length > 2) {
       alert(`Battle participants must be less than ${this.battleParticipants.length}`);
     }
 
-    if (this.battleParticipants.length !== 2){
+    if (this.battleParticipants.length !== 2) {
       return;
     }
 
@@ -59,24 +61,24 @@ class FightersView extends View {
     battle.startBattle();
   }
 
-  async handleSelectFighterClick (event, fighter){
+  async handleSelectFighterClick(event, fighter) {
     await this.addFighterIfNotExist(fighter);
     let isChecked = event.toElement.checked;
 
-    let participant =  this.battleParticipants.find(participant => participant._id === fighter._id);
-     
+    let participant = this.battleParticipants.find(participant => participant._id === fighter._id);
 
-    if(isChecked && this.battleParticipants.length >= 2 && !participant){
+
+    if (isChecked && this.battleParticipants.length >= 2 && !participant) {
       event.toElement.checked = false;
     }
 
-    if (isChecked && this.battleParticipants.length < 2 && !participant){
+    if (isChecked && this.battleParticipants.length < 2 && !participant) {
       let fighterWithDetailInformation = this.fightersDetailsMap.get(fighter._id);
-      
-       this.battleParticipants.push(fighterWithDetailInformation);
+
+      this.battleParticipants.push(fighterWithDetailInformation);
     }
 
-    if(!isChecked && participant){
+    if (!isChecked && participant) {
       this.battleParticipants = this.battleParticipants.filter(participant => participant._id !== fighter._id);
     }
   }
@@ -93,52 +95,52 @@ class FightersView extends View {
     this.addEditDataToPopup(result);
 
     $('.popup-close').on('click', () => {
-        this.closePopup();
-      });
+      this.closePopup();
+    });
 
-      // get from map or load info and add to fightersMap
-      // show modal with fighter info
-      // allow to edit health and power in this modal
-    }
+    // get from map or load info and add to fightersMap
+    // show modal with fighter info
+    // allow to edit health and power in this modal
+  }
 
-    addEditDataToPopup = (object) => {
-      let entries = Object.entries(object);
+  addEditDataToPopup = (object) => {
+    let entries = Object.entries(object);
 
-      entries =  entries.filter(entry => entry[0] !== '_id' && entry[0] !== 'source' && entry[0] !== 'name');
-      let htmlText ='';
-      entries.forEach(item => {
-          htmlText += `  <label for="${item[0]}"><b>${item[0]}</b></label>
+    entries = entries.filter(entry => entry[0] !== '_id' && entry[0] !== 'source');
+    let htmlText = '';
+    entries.forEach(item => {
+      htmlText += `  <label for="${item[0]}"><b>${item[0]}</b></label>
                         <input type="text" id="${item[0]}" value="${item[1]}" 
                         placeholder="Enter ${item[0]}" name="${item[0]}"/> 
                         <br/>`;
-      });  
+    });
 
-      htmlText += '<br/> <button id="editFighter">Edit</button>';
-      $('#editPopup').append(htmlText);
+    htmlText += '<br/> <button id="editFighter">Edit</button>';
+    $('#editPopup').append(htmlText);
 
-      $('#editFighter').on('click', () => this.getChangedFighterData(object));
+    $('#editFighter').on('click', () => this.getChangedFighterData(object));
   }
 
-  async addFighterIfNotExist(fighter){
+  async addFighterIfNotExist(fighter) {
     if (!this.fightersDetailsMap.has(fighter._id)) {
       const result = await fighterService.getFighterDetails(fighter._id);
       this.fightersDetailsMap.set(fighter._id, result);
     }
   }
 
-  getChangedFighterData = (object) =>{
+  getChangedFighterData = (object) => {
     let keys = Object.keys(object);
-    keys.forEach(key => object[key] = $('#'+key).val());
+    keys.forEach(key => object[key] = $('#' + key).val());
     this.fightersDetailsMap.set(object._id, object);
     this.closePopup();
   }
 
-  openPopup =() =>{
-    $('.overlay').css('display',  'block');
+  openPopup = () => {
+    $('.overlay').css('display', 'block');
   }
 
-  closePopup =()=> {
-    $('.overlay').css('display',  'none');
+  closePopup = () => {
+    $('.overlay').css('display', 'none');
     $('#editPopup').empty();
   }
 }

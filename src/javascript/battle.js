@@ -25,9 +25,14 @@ class Battle {
     figtherHit(fighter1, fighter2){
        const hitPower =  fighter1.getHitPower();
        const blockPower = fighter2.getBlockPower();
-        fighter2.health =  fighter2.health - ( hitPower - blockPower);
-        console.log(` ${fighter1.name}  hit   ${fighter2.name} with hit power ${hitPower} and blockPower ${blockPower}. `);
-        this.addMessage(` ${fighter2.name}  have ${fighter2.health}. `);
+       let damage= hitPower - blockPower;
+       if(damage<=0){
+        this.addMessage(` ${fighter2.name}  evaded the attack`);
+        return;
+       }
+        fighter2.health =  fighter2.health - damage;
+        this.addMessage(` ${fighter1.name}  deals ${damage.toFixed(1)} damage to ${fighter2.name}`);
+        this.addMessage(` ${fighter2.name}  has ${fighter2.health.toFixed(1)} HP.`);
     }
 
 
