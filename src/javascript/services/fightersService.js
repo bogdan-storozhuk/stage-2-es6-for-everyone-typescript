@@ -1,31 +1,30 @@
 import {
-  callApi
+  getData,
+  putData
 } from '../helpers/apiHelper';
 
 class FighterService {
 
   async getFighters() {
     try {
-      const endpoint = 'fighters.json';
-      const apiResult = await callApi(endpoint, 'GET');
+      const endpoint = '/users/';
+      const apiResult = await getData(endpoint);
 
-      return JSON.parse(atob(apiResult.content));
+      return apiResult;
     } catch (error) {
       throw error;
     }
   }
 
-  async getFighterDetails(_id) {
-    const path = `./resources/api/details/fighter/${_id}.json`;
-    const res = await fetch(path);
-    if (!res.ok) {
-      throw new Error(`Could not fetch ${path}` +
-        `, received ${res.status}`)
+  async updateFighterDetails(figther) {
+    const endpoint = `/users/${figther._id}`;
+    try {
+      let jsonFigther = JSON.stringify(figther);
+      return putData(endpoint, jsonFigther);
+    } catch (error) {
+      throw error;
     }
-    const jsonObject = await res.json();
-    return await jsonObject;
-
-  };
+  }
 }
 
 export const fighterService = new FighterService();

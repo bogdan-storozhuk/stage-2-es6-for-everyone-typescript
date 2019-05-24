@@ -1,5 +1,7 @@
 import FightersView from './fightersView';
-import { fighterService } from './services/fightersService';
+import {
+  fighterService
+} from './services/fightersService';
 
 class App {
   constructor() {
@@ -12,7 +14,7 @@ class App {
   async startApp() {
     try {
       App.loadingElement.style.visibility = 'visible';
-      
+
       const fighters = await fighterService.getFighters();
       const fightersView = new FightersView(fighters);
       const fightersElement = fightersView.element;

@@ -1,18 +1,30 @@
-const API_URL = 'https://api.github.com/repos/binary-studio-academy/stage-2-es6-for-everyone/contents/resources/api/';
+const API_URL = 'https://streetfighter-nodejs.herokuapp.com';
 
-function callApi(endpoind, method) {
-  const url = API_URL + endpoind;
-  const options = {
-    method
-  };
 
-  return fetch(url, options)
-    .then(response =>
-      response.ok ? response.json() : Promise.reject(Error('Failed to load'))
-    )
-    .catch(error => {
-      throw error;
-    });
+async function getData(endpoint) {
+  const url = API_URL + endpoint;
+  const result = await fetch(url);
+  return await result.json();
 }
 
-export { callApi }
+async function putData(endpoint, data) {
+  const result = await fetch(API_URL + endpoint, {
+    method: 'PUT',
+    mode: 'cors',
+    cache: 'default',
+    credentials: 'omit',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: data,
+    redirect: 'follow',
+    referrer: 'client',
+  });
+
+  return result.ok;
+}
+
+export {
+  getData,
+  putData
+}

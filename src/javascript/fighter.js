@@ -6,12 +6,12 @@ class Fighter {
         this.defense = object.defense;
     }
     getHitPower() {
-        let criticalHitChance= this.getRandomNumber();
+        let criticalHitChance = this.getRandomNumber();
         return this.attack * criticalHitChance;
     }
-    
-    getBlockPower(){
-        let dodgeChance= this.getRandomNumber();
+
+    getBlockPower() {
+        let dodgeChance = this.getRandomNumber();
         return this.defense * dodgeChance;
     }
 
