@@ -5,19 +5,52 @@ import {
 } from './services/fightersService';
 import Battle from './battle';
 
-class FightersView extends View {
-  constructor(fighters) {
+// interface IFighter {
+//   name: string;
+//   health: number;
+//   attack: number;
+//   defense: number;
+// }
+interface IFighterData {
+  _id: number;
+  name: string;
+  health: number;
+  attack: number;
+  defense: number;
+  source:string;
+}
+
+interface IFightersView {
+  fightersDetailsMap: Map<number, IFighterData>;
+  battleParticipants: IFighterData[];
+ 
+
+}
+type HTMLElementEvent<T extends HTMLElement> = Event & {
+  target: {
+    checked: boolean
+  }; 
+  // probably you might want to add the currentTarget as well
+  // currentTarget: T;
+}
+
+
+class FightersView extends View implements IFightersView {
+  handleClick: (event: Event, fighter: IFighterData) => Promise<void>;
+  handleSelectedFighterClick!: (event: Event, fighter: IFighterData) => Promise<void>;
+  element: HTMLElement | undefined;
+  constructor(fighters: IFighterData[]) {
     super();
 
     this.handleClick = this.handleFighterClick.bind(this);
-    this.handleSelectedFighterClick = this.handleSelectFighterClick.bind(this);
+    this.handleSelectFighterClick = this.handleSelectFighterClick.bind(this);
     this.createFighters(fighters);
   }
 
-  fightersDetailsMap = new Map();
-  battleParticipants = [];
+  fightersDetailsMap: Map<number, IFighterData> = new Map();
+  battleParticipants: IFighterData[] = [];
 
-  createFighters(fighters) {
+  private createFighters(fighters:IFighterData[]) : HTMLElement | void{
     const fighterElements = fighters.map(fighter => {
       const fighterView = new FighterView(fighter, this.handleClick, this.handleSelectedFighterClick);
       return fighterView.element;
@@ -28,19 +61,19 @@ class FightersView extends View {
       className: 'fighters'
     });
 
-    let button = document.createElement("button"),
-      rootElement = document.getElementById('root');
+    let button  = document.createElement("button") as HTMLButtonElement,
+      rootElement  = document.getElementById('root') as HTMLElement;
     button.innerHTML = "Start battle";
     button.id = 'startBattle';
-    button.classList = 'start';
+    button.classList.add('start');
     rootElement.appendChild(button);
     this.element.append(...fighterElements);
 
 
-    button.addEventListener('click', event => this.initializeBattle(event), false);
+    button.addEventListener('click', event => this.initializeBattle(), false);
   }
 
-  initializeBattle() {
+  private initializeBattle():void {
     if (this.battleParticipants.length < 2) {
       alert(`Battle participants must be more than ${this.battleParticipants.length}`);
     }
@@ -61,19 +94,19 @@ class FightersView extends View {
     battle.startBattle();
   }
 
-  async handleSelectFighterClick(event, fighter) {
+  async handleSelectFighterClick(event:HTMLElementEvent<HTMLTextAreaElement>, fighter: IFighterData) :Promise<void> {
     await this.addFighterIfNotExist(fighter);
-    let isChecked = event.toElement.checked;
+    let isChecked = event.target.checked;
 
     let participant = this.battleParticipants.find(participant => participant._id === fighter._id);
 
 
     if (isChecked && this.battleParticipants.length >= 2 && !participant) {
-      event.toElement.checked = false;
+      event.target.checked = false;
     }
 
     if (isChecked && this.battleParticipants.length < 2 && !participant) {
-      let fighterWithDetailInformation = this.fightersDetailsMap.get(fighter._id);
+      let fighterWithDetailInformation:IFighterData = this.fightersDetailsMap.get(fighter._id) as IFighterData;
 
       this.battleParticipants.push(fighterWithDetailInformation);
     }
@@ -83,35 +116,32 @@ class FightersView extends View {
     }
   }
 
-  async handleFighterClick(event, fighter) {
-
+  async handleFighterClick(event:Event, fighter:IFighterData):Promise<void>{
     await this.addFighterIfNotExist(fighter);
-
-    let result = this.fightersDetailsMap.get(fighter._id);
-
-
+    let result :IFighterData = this.fightersDetailsMap.get(fighter._id) as IFighterData;
     this.openPopup();
-
     this.addEditDataToPopup(result);
 
     $('.popup-close').on('click', () => {
       this.closePopup();
     });
-
-    // get from map or load info and add to fightersMap
-    // show modal with fighter info
-    // allow to edit health and power in this modal
   }
 
-  addEditDataToPopup = (object) => {
+  private addEditDataToPopup = (object : IFighterData):void => {
     let entries = Object.entries(object);
 
-    entries = entries.filter(entry => entry[0] !== '_id' && entry[0] !== 'source');
     let htmlText = '';
-    entries.forEach(item => {
+
+    entries.forEach((item, index) => {
+      let disabled = false;
+      if (index === 0 || index === 1) {
+        disabled = true;
+      }
+
       htmlText += `  <label for="${item[0]}"><b>${item[0]}</b></label>
                         <input type="text" id="${item[0]}" value="${item[1]}" 
-                        placeholder="Enter ${item[0]}" name="${item[0]}"/> 
+                        placeholder="Enter ${item[0]}" name="${item[0]}" 
+                        ${disabled ? "disabled" : ""}/> 
                         <br/>`;
     });
 
@@ -121,25 +151,31 @@ class FightersView extends View {
     $('#editFighter').on('click', () => this.getChangedFighterData(object));
   }
 
-  async addFighterIfNotExist(fighter) {
+  private async addFighterIfNotExist(fighter:IFighterData):Promise<void> {
     if (!this.fightersDetailsMap.has(fighter._id)) {
-      const result = await fighterService.getFighterDetails(fighter._id);
-      this.fightersDetailsMap.set(fighter._id, result);
+      this.fightersDetailsMap.set(fighter._id, fighter);
     }
   }
 
-  getChangedFighterData = (object) => {
-    let keys = Object.keys(object);
+  //testretr
+  private getChangedFighterData = async (object:any):Promise<void> => {
+    let keys : Array<any> = Object.keys(object);
     keys.forEach(key => object[key] = $('#' + key).val());
     this.fightersDetailsMap.set(object._id, object);
+
+    const isSuccess = await fighterService.updateFighterDetails(object);
+    if (isSuccess) {
+      alert("Fighter was edited successfully!");
+    }
+
     this.closePopup();
   }
 
-  openPopup = () => {
+  private openPopup = ():void => {
     $('.overlay').css('display', 'block');
   }
 
-  closePopup = () => {
+  private closePopup = ():void => {
     $('.overlay').css('display', 'none');
     $('#editPopup').empty();
   }
