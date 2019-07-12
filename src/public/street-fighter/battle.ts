@@ -1,13 +1,19 @@
-import Fighter from './fighter.js';
+import Fighter from './fighter';
+import { IFighterData } from './helpers/apiHelper';
+interface IBattle {
+    startBattle:()=>void;
+  }
 
-class Battle {
-    constructor(fighter1, fighter2) {
+class Battle implements IBattle {
+    private fighter1: Fighter;
+    private fighter2: Fighter;
+    constructor(fighter1:IFighterData, fighter2:IFighterData) {
         this.fighter1 = new Fighter(fighter1);
         this.fighter2 = new Fighter(fighter2);
 
     }
 
-    startBattle() {
+    startBattle():void {
         while (this.fighter1.health > 0 && this.fighter2.health > 0) {
             this.figtherHit(this.fighter1, this.fighter2);
             this.figtherHit(this.fighter2, this.fighter1);
@@ -22,7 +28,7 @@ class Battle {
         }
     }
 
-    figtherHit(fighter1, fighter2) {
+    private figtherHit(fighter1:Fighter, fighter2:Fighter):void {
         const hitPower = fighter1.getHitPower();
         const blockPower = fighter2.getBlockPower();
         let damage = hitPower - blockPower;
@@ -36,7 +42,7 @@ class Battle {
     }
 
 
-    addMessage(text) {
+    private addMessage(text:string):void {
         let htmlText = `<p>${text}</p>`;
         $('#editPopup').append(htmlText);
     }

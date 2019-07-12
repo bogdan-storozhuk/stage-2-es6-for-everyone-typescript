@@ -1,13 +1,24 @@
 import View from './view';
+import { IFighterData } from './helpers/apiHelper';
 
-class FighterView extends View {
-  constructor(fighter, handleClick, handleSelectFighterClick) {
+
+
+interface IFighterView {
+  createFighter:(fighter:IFighterData, handleClick:Function, handleSelectFighterClick:Function)=>void;
+}
+
+
+
+class FighterView extends View implements IFighterView{
+  
+  element: any;
+  constructor(fighter:IFighterData, handleClick:Function, handleSelectFighterClick:Function) {
     super();
 
     this.createFighter(fighter, handleClick, handleSelectFighterClick);
   }
 
-  createFighter(fighter, handleClick, handleSelectFighterClick) {
+  createFighter(fighter:IFighterData, handleClick:Function, handleSelectFighterClick:Function):void {
     const {
       name,
       source
@@ -26,7 +37,7 @@ class FighterView extends View {
     inputElement.addEventListener('click', event => handleSelectFighterClick(event, fighter), false);
   }
 
-  createName(name) {
+  private createName(name:string):HTMLElement {
     const nameElement = this.createElement({
       tagName: 'span',
       className: 'name'
@@ -36,7 +47,7 @@ class FighterView extends View {
     return nameElement;
   }
 
-  createImage(source) {
+  private createImage(source:string):HTMLElement {
     const attributes = {
       src: source
     };
@@ -49,7 +60,7 @@ class FighterView extends View {
     return imgElement;
   }
 
-  createInput(inputType) {
+  private createInput(inputType:string):HTMLElement {
     const attributes = {
       type: inputType
     };
